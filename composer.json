@@ -1,5 +1,5 @@
 {
-    "name": "strong2much/yii2-word",
+    "name": "natmars/yii2-word",
     "type": "yii2-extension",
     "minimum-stability": "stable",
     "description": "Helper and wrapper class for PHPWord for simple communication",
@@ -20,7 +20,8 @@
     },
     "autoload": {
         "psr-4": {
-            "strong2much\\word\\": "src/"
+            "natmars\\word\\": "src/",
+            "natmars\\example\\": "example/"
         }
     }
 }

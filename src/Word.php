@@ -1,5 +1,5 @@
 <?php
-namespace strong2much\word;
+namespace natmars\word;
 
 use Yii;
 use yii\base\Component;
@@ -112,5 +112,44 @@ class Word extends Component
         $writer->save('php://output');
 
         Yii::$app->end();
+    }
+
+    /**
+     * Loads a template, replaces variable-tokens with provided data (variables), replaces multi-line tokens with arrays (tables) and saves a new file.
+     * Each token should have the following format in document: ${token}. In array you need to provide only (@see token)
+     * @param $templateName
+     * @param $newFileName
+     * @param array $data
+     */
+    public function saveFromMultiLineTemplate($templateName, $newFileName, $data = [])
+    {
+        $document = new TemplateProcessor($templateName);
+
+        if (isset($data)) {
+            foreach ($data as $name => $value) {
+                // if the value is not an array just set the variable
+                if (!is_array($value)) {
+                    $document->setValue($name, $value);
+                } else {
+                    // if the value is an array, clone the row and set the appropriate variables
+                    $items = $value;
+                    // first create a clone for the master row
+                    $document->cloneRow($name, count($items));
+                    // set variables for the clone row
+                    $i = 1;
+                    if ($items) {
+                        foreach ($items as $item) {
+                            foreach ($item as $key_item => $value_item) {
+                                $document->setValue($key_item . '#' . $i, $value_item);
+                                $document->setValue($name . '#' . $i, "");
+                            }
+                            $i++;
+                        }
+                    }
+                }
+            }
+        }
+
+        $document->saveAs($newFileName);
     }
 }

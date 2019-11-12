@@ -23,26 +23,26 @@ or add
 
 Create a Microsoft Word file. 
 
-Use `${variableName}` to set the variables. Use `${tableName}`, `${itemName}` to generate the table (the value of `${tableName}` is set to empty, but the values ​​of `${itemName}` are set to match the data in the array). Looks like this:
+Use `${variableName}` to set variables. Use `${tableName}`, `${itemName}` to generate a table (the value of `${tableName}` is set to empty, but the values ​​of `${itemName}` are set to match a data in an array). Result will look like this:
 
 ![Word Template Screenshot](/example/templates/template.png?raw=true)
 
 ### 2. Saving template
 
-Set the file name as `$fileName`, put the file in the template directory `$reportTemplatesFileDir` and determine the location to save the finished file `$reportLog`
+Set the file name as `$fileName`, put the file in the template directory `$templatesDir` and determine the location to save the finished file `$tmpDir`
 
 ### 3. Generating the report 
 
 ```php
 use natmars\word\Word;
 
-$templateName = $reportTemplatesFileDir . $fileName;
-$newFileName = $reportLog . $fileName;
+$templateFullPath = $templatesDir . $fileName;
+$outputFullPath = $tmpDir . $fileName;
         
 $phpWord = new Word();
 
 // create a file using a template
-$phpWord->saveFromMultiLineTemplate($templateName, $newFileName, [
+$phpWord->saveFromMultiLineTemplate($templateFullPath, $outputFullPath, [
     'variableName' => 'variableValue',
     'tableName' => [
         ['itemName' => 'itemValue1'],
@@ -52,7 +52,7 @@ $phpWord->saveFromMultiLineTemplate($templateName, $newFileName, [
 ]);
 
 // download file
-\Yii::$app->response->sendFile($newFileName, $fileName);
+$phpWord->downloadTemplate($outputFullPath);
 ```
 
 ### 4. Check your output report document

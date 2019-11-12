@@ -1,25 +1,22 @@
 <?php
 namespace natmars\example;
 
+use natmars\word\Word;
 use Yii;
 use yii\base\Component;
-use natmars\word\Word;
 
 class Test extends Component
 {
     public static function generate()
     {
-        $reportTemplatesFileDir = Yii::getAlias('@natmars/example') . '/templates/';
-        $reportLog = Yii::$app->getRuntimePath() . '/';
-        $fileName = 'report.docx';
-
-        $templateName = $reportTemplatesFileDir . $fileName;
-        $newFileName = $reportLog . $fileName;
+        $fileName = 'template.docx';
+        $templateFullPath = Yii::getAlias('@natmars/example') . '/templates/' . $fileName;
+        $outputFullPath = Yii::$app->getRuntimePath() . '/' . $fileName;
 
         $phpWord = new Word();
 
         // create a file using a template
-        $phpWord->saveFromMultiLineTemplate($templateName, $newFileName, [
+        $phpWord->saveFromMultiLineTemplate($templateFullPath, $outputFullPath, [
             'variable_1' => 'value_1',
             'variable_2' => 'value_2',
             'variable_3' => 'value_3',
@@ -36,6 +33,6 @@ class Test extends Component
         ]);
 
         // download file
-        \Yii::$app->response->sendFile($newFileName, 'multi_lines_' . $fileName);
+        $phpWord->downloadTemplate($outputFullPath);
     }
 }

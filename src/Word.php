@@ -70,19 +70,21 @@ class Word extends Component
     /**
      * Loads template, replaces tokens with provided data and saves new file.
      * Token should have the following format in document: ${token}. In array you need to provide only (@see token)
-     * @param string $templateName file name
-     * @param string $newFileName file name
+     * @param string $templateFullPath file name
+     * @param string $outputFullPath file name
      * @param array $data list of tokens that should be replaced with the appropriate value, in format: (token => value)
      */
-    public function saveFromTemplate($templateName, $newFileName, $data = [])
+    public function saveFromTemplate($templateFullPath, $outputFullPath, $data = [])
     {
-        $document = new TemplateProcessor($templateName);
+        $document = new TemplateProcessor($templateFullPath);
 
         foreach($data as $key=>$value) {
             $document->setValue($key, $value);
         }
 
-        $document->saveAs($newFileName);
+        $document->saveAs($outputFullPath);
+
+        return $outputFullPath;
     }
 
     /**
@@ -117,13 +119,13 @@ class Word extends Component
     /**
      * Loads a template, replaces variable-tokens with provided data (variables), replaces multi-line tokens with arrays (tables) and saves a new file.
      * Each token should have the following format in document: ${token}. In array you need to provide only (@see token)
-     * @param $templateName
-     * @param $newFileName
+     * @param $templateFullPath
+     * @param $outputFullPath
      * @param array $data
      */
-    public function saveFromMultiLineTemplate($templateName, $newFileName, $data = [])
+    public function saveFromMultiLineTemplate($templateFullPath, $outputFullPath, $data = [])
     {
-        $document = new TemplateProcessor($templateName);
+        $document = new TemplateProcessor($templateFullPath);
 
         if (isset($data)) {
             foreach ($data as $name => $value) {
@@ -150,6 +152,16 @@ class Word extends Component
             }
         }
 
-        $document->saveAs($newFileName);
+        $document->saveAs($outputFullPath);
+
+        return $outputFullPath;
+    }
+
+    public function downloadTemplate($fullPath)
+    {
+        // file will be deleted after finished download
+        return \Yii::$app->response->sendFile($fullPath)->on(\yii\web\Response::EVENT_AFTER_SEND, function ($event) {
+            unlink($event->data);
+        }, $fullPath);
     }
 }

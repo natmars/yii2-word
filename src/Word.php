@@ -1,13 +1,13 @@
 <?php
 namespace natmars\word;
 
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\TemplateProcessor;
+use PhpOffice\PhpWord\PhpWord;
 use Yii;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\TemplateProcessor;
-use PhpOffice\PhpWord\IOFactory;
 
 /**
  * Manager class that handles with Word.
@@ -17,10 +17,18 @@ use PhpOffice\PhpWord\IOFactory;
 class Word extends Component
 {
     /**
+     * @var array map of format => extension
+     */
+    protected static $map = [
+        'ODText' => 'odt',
+        'RTF' => 'rtf',
+        'HTML' => 'html',
+        'Word2007' => 'docx',
+    ];
+    /**
      * @var string default format (@see static::$map)
      */
     public $defaultFormat = 'Word2007';
-
     /**
      * @var array default properties
      */
@@ -35,16 +43,6 @@ class Word extends Component
     ];
 
     /**
-     * @var array map of format => extension
-     */
-    protected static $map = [
-        'ODText' => 'odt',
-        'RTF' => 'rtf',
-        'HTML' => 'html',
-        'Word2007' => 'docx',
-    ];
-
-    /**
      * New instance
      * @param bool $setDefaultProperties initialize instance with default properties
      * @return PHPWord
@@ -52,7 +50,7 @@ class Word extends Component
     public function getInstance($setDefaultProperties = true)
     {
         $phpWord = new PHPWord();
-        if($setDefaultProperties) {
+        if ($setDefaultProperties) {
             $phpWord->getDocInfo()
                 ->setCreator(ArrayHelper::getValue($this->properties, 'creator'))
                 ->setLastModifiedBy(ArrayHelper::getValue($this->properties, 'creator'))
@@ -78,13 +76,11 @@ class Word extends Component
     {
         $document = new TemplateProcessor($templateFullPath);
 
-        foreach($data as $key=>$value) {
+        foreach ($data as $key => $value) {
             $document->setValue($key, $value);
         }
 
         $document->saveAs($outputFullPath);
-
-        return $outputFullPath;
     }
 
     /**
@@ -95,20 +91,20 @@ class Word extends Component
      */
     public function download(PHPWord &$phpWord, $fileName, $format = 'Word2007')
     {
-        if(!in_array($format, array_keys(static::$map))) {
+        if (!in_array($format, array_keys(static::$map))) {
             $format = $this->defaultFormat;
         }
-        $fileName .= '.'.static::$map[$format];
+        $fileName .= '.' . static::$map[$format];
 
-        header('Content-Type: '.FileHelper::getMimeTypeByExtension($fileName));
-        header('Content-Disposition: attachment;filename="'.$fileName.'"');
+        header('Content-Type: ' . FileHelper::getMimeTypeByExtension($fileName));
+        header('Content-Disposition: attachment;filename="' . $fileName . '"');
         header('Cache-Control: max-age=0');
         header('Cache-Control: max-age=1'); // If you're serving to IE 9, then the following may be needed
         // If you're serving to IE over SSL, then the following may be needed
-        header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
-        header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
-        header ('Cache-Control: cache, must-revalidate'); // HTTP/1.1
-        header ('Pragma: public'); // HTTP/1.0
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT'); // always modified
+        header('Cache-Control: cache, must-revalidate'); // HTTP/1.1
+        header('Pragma: public'); // HTTP/1.0
 
         $writer = IOFactory::createWriter($phpWord, $format);
         $writer->save('php://output');
@@ -153,8 +149,6 @@ class Word extends Component
         }
 
         $document->saveAs($outputFullPath);
-
-        return $outputFullPath;
     }
 
     public function downloadTemplate($fullPath)

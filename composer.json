@@ -15,7 +15,7 @@
     ],
     "require": {
         "php": ">=5.4",
-		"phpoffice/phpword": "0.12.*",
+		"phpoffice/phpword": "0.17.*",
         "yiisoft/yii2": "*"
     },
     "autoload": {
